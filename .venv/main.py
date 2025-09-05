@@ -20,7 +20,7 @@ while True:
     img_resized = cv2.resize(img, (640, 480))
 
     imgBackground[162:162+480, 55:55+640] = img_resized
-    imgBackground[44:44+633, 808:808+414] = imgModeList[1]
+    imgBackground[44:44+633, 808:808+414] = imgModeList[0]
 
     # cv2.imshow("Webcam", img_resized)
     cv2.imshow("Background", imgBackground)
