@@ -4,7 +4,6 @@ import pickle
 import face_recognition
 import numpy as np
 import cvzone
-
 cap = cv2.VideoCapture(0)
 cap.set(3, 1280)
 cap.set(4, 720)
@@ -32,6 +31,7 @@ while True:
     imgS = cv2.resize(img, (0, 0), None, 0.25, 0.25)
     imgS = cv2.cvtColor(imgS, cv2.COLOR_BGR2RGB)
 
+
     faceCurFrame = face_recognition.face_locations(imgS)
     encodeCurFrame = face_recognition.face_encodings(imgS, faceCurFrame)
 
@@ -39,38 +39,24 @@ while True:
 
     imgBackground[162:162+480, 55:55+640] = img_resized
     imgBackground[44:44+633, 808:808+414] = imgModeList[0]  
+
     for encodeFace, faceLoc in zip(encodeCurFrame, faceCurFrame):
         matches = face_recognition.compare_faces(encodeListKnown, encodeFace)
         faceDis = face_recognition.face_distance(encodeListKnown, encodeFace)
-        print("matches", matches)
-        print("faceDis", faceDis)
+        #print("matches", matches)
+        #print("faceDis", faceDis)
         matchIndex = np.argmin(faceDis)
         #print("matchIndex", matchIndex)
+
         if matches[matchIndex]:
-            print("Known Face Detected")
+            #print("Known Face Detected")
             y1, x2, y2, x1 = faceLoc
             y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
+            bbox = 55 + x1, 162 + y1, x2 - x1, y2 - y1
+            imgBackground = cvzone.cornerRect(imgBackground, bbox, rt=0)
+            
 
-    # find center of the detected face
-            cx = (x1 + x2) // 2
-            cy = (y1 + y2) // 2
 
-    # shift into background coordinates
-            cx_bg = 55 + cx
-            cy_bg = 162 + cy
-
-    # define box size (slightly bigger than face)
-            box_w = (x2 - x1) + 60
-            box_h = (y2 - y1) + 80
-
-    # build centered bbox
-            x1_bg = cx_bg - box_w // 2
-            y1_bg = cy_bg - box_h // 2
-            bbox = (x1_bg, y1_bg, box_w, box_h)
-
-            imgBackground = cvzone.cornerRect(imgBackground, bbox, rt=0, colorC=(0,255,0))
-        else:
-            print("Unknown Face Detected") 
     # cv2.imshow("Webcam", img_resized)
-    cv2.imshow("Background", imgBackground)
+    cv2.imshow("Face Attendance", imgBackground)
     cv2.waitKey(1)
